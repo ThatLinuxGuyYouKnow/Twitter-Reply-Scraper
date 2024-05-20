@@ -1,0 +1,58 @@
+import requests
+from urllib.parse import urlparse
+
+# Replace with your RapidAPI key
+import os
+
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+API_HOST = os.getenv("API_HOST")
+
+
+
+def get_tweet_id_from_url(url):
+    """Extract the tweet ID from the tweet URL."""
+    path = urlparse(url).path
+    tweet_id = path.split('/')[-1]
+    return tweet_id
+
+def get_replies(tweet_id):
+    """Get replies to a tweet using the Twitter API on RapidAPI."""
+    url = f"https://{API_HOST}/tweet/replies"
+    querystring = {"tweet_id": tweet_id}
+
+    headers = {
+        'X-RapidAPI-Key': RAPIDAPI_KEY,
+        'X-RapidAPI-Host': API_HOST
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        response.raise_for_status()
+
+def extract_replier_info(replies):
+    """Extract usernames and account IDs of the repliers."""
+    repliers = []
+    for reply in replies.get('replies', []):
+        user = reply.get('user', {})
+        username = user.get('username')
+        account_id = user.get('user_id')
+        if username and account_id:
+            repliers.append((username, account_id))
+    return repliers
+
+if __name__ == "__main__":
+    tweet_url = input("Enter the tweet URL: ")
+    tweet_id = get_tweet_id_from_url(tweet_url)
+    try:
+        replies = get_replies(tweet_id)
+        repliers_info = extract_replier_info(replies)
+        if repliers_info:
+            print("Repliers Info:", repliers_info)
+        else:
+            print("No replies found.")
+    except requests.exceptions.RequestException as e:
+        print(f"HTTP Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
