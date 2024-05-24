@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 
 import os
 
+# Replace with your RapidAPI key
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
 API_HOST = os.getenv("API_HOST")
 
