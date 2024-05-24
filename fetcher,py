@@ -1,7 +1,6 @@
 import requests
 from urllib.parse import urlparse
 
-# Replace with your RapidAPI key
 import os
 
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
